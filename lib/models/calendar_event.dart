@@ -2,9 +2,9 @@
 enum CalendarEventType{
   prova('prova', 'Prova'),
   trabalho('trabalho','Trabalho'),
-  seminario('seminario','Seminario'),
+  seminario('seminario','Seminário'),
   evento('evento','Evento'),
-  academico('academico','academico'),
+  academico('academico','Acadêmico'),
   pessoal('pessoal','Pessoal');
 
   final String value;

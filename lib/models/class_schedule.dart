@@ -55,7 +55,7 @@ class ClassSchedule {
       };
   factory ClassSchedule.fromJson(Map<String, dynamic> json) => ClassSchedule(
         id: json['id'] as String,
-        dayOfWeek: AppDay.fromValue(json['type'] as String),
+        dayOfWeek: AppDay.fromValue(json['dayOfWeek'] as String),
         startTime: json['startTime'] as String,
         endTime: json['endTime'] as String,
         subject: json['subject'] as String,
