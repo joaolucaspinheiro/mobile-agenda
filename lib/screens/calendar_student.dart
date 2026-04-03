@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
+import '../models/calendar_event.dart';
 import './form_calendar.dart';
+import './form_edit_calendar.dart';
 
 class CalendarStudent extends StatefulWidget {
   const CalendarStudent({super.key});
@@ -9,6 +11,7 @@ class CalendarStudent extends StatefulWidget {
 }
 
 class _CalendarStudentState extends State<CalendarStudent> {
+  final List<CalendarEvent> _events = [];
   final CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
@@ -17,6 +20,9 @@ class _CalendarStudentState extends State<CalendarStudent> {
 
   @override
   Widget build(BuildContext context) {
+    final selectedEvents = _selectedDay == null
+        ? []
+        : _events.where((event) => isSameDay(event.date, _selectedDay)).toList();
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -75,16 +81,50 @@ class _CalendarStudentState extends State<CalendarStudent> {
                 _focusedDay = focusedDay;
               },
             ),
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => const FormCalendar()),);
+    ),
+    const SizedBox(height: 8.0),
+      Expanded(
+        child: selectedEvents.isEmpty
+            ? Center(child: Text('Nenhum evento neste dia.', style: TextStyle(color: Colors.grey)))
+            : ListView.builder(
+          itemCount: selectedEvents.length,
+          itemBuilder: (context, index) {
+            final event = selectedEvents[index];
+            return ListTile(
+              title: Text(event.title),
+              subtitle: Text(event.type.label),
+              leading: Icon(Icons.event, color: Colors.green.shade400),
+              onTap: () async {
+                final updatedEvent = await Navigator.push<CalendarEvent>(
+                  context,
+                  MaterialPageRoute(builder: (context) => FormEditCalendar(event: event)),
+                );
+                if (updatedEvent != null) {
+                  setState(() {
+                    final index = _events.indexWhere((e) => e.id == updatedEvent.id);
+                    if (index != -1) _events[index] = updatedEvent;
+                  });
+                }
+              },
+            );
+          },
+    ),
+    ),
+    ],
+    ),
+    floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          final newEvent = await Navigator.push<CalendarEvent>(
+            context,
+            MaterialPageRoute(builder: (context) => const FormCalendar()),
+          );
+          if (newEvent != null) {
+            setState(() => _events.add(newEvent));
+          }
         },
-        child: Icon(Icons.add),
-        backgroundColor: Colors.green.shade400,
-        foregroundColor: Colors.white,
+      backgroundColor: Colors.green.shade400,
+      foregroundColor: Colors.white,
+      child: Icon(Icons.add),
       ),
     );
   }
