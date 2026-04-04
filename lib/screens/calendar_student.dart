@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:test_application/screens/event_detail.dart';
 import '../models/calendar_event.dart';
 import './form_calendar.dart';
 import './form_edit_calendar.dart';
@@ -94,6 +95,12 @@ class _CalendarStudentState extends State<CalendarStudent> {
               title: Text(event.title),
               subtitle: Text(event.type.label),
               leading: Icon(Icons.event, color: Colors.green.shade400),
+              onTap: () async {
+                Navigator.push<CalendarEvent>(
+                  context,
+                  MaterialPageRoute(builder: (context) => EventDetail(event: event)),
+                );
+              },
               trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
