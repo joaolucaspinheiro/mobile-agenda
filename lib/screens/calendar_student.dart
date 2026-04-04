@@ -94,7 +94,12 @@ class _CalendarStudentState extends State<CalendarStudent> {
               title: Text(event.title),
               subtitle: Text(event.type.label),
               leading: Icon(Icons.event, color: Colors.green.shade400),
-              onTap: () async {
+              trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+              IconButton(
+              icon: Icon(Icons.edit, color: Colors.green),
+              onPressed: () async {
                 final updatedEvent = await Navigator.push<CalendarEvent>(
                   context,
                   MaterialPageRoute(builder: (context) => FormEditCalendar(event: event)),
@@ -106,12 +111,41 @@ class _CalendarStudentState extends State<CalendarStudent> {
                   });
                 }
               },
+            ),
+            IconButton(
+            icon: Icon(Icons.delete, color: Colors.red),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: Text('Excluir evento'),
+                      content: Text('Tem certeza que deseja excluir "${event.title}"?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text('Cancelar'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            setState(() => _events.removeWhere((e) => e.id == event.id));
+                            Navigator.pop(context);
+                          },
+                          style: TextButton.styleFrom(foregroundColor: Colors.red),
+                          child: Text('Excluir'),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+                  ],
+              ),
             );
           },
-    ),
-    ),
-    ],
-    ),
+        ),
+      ),
+        ],
+      ),
     floatingActionButton: FloatingActionButton(
         onPressed: () async {
           final newEvent = await Navigator.push<CalendarEvent>(
