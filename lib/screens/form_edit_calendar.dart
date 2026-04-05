@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/calendar_event.dart';
+import '../widgets/app_scaffold.dart';
 
 class FormEditCalendar extends StatefulWidget{
   final CalendarEvent event;
@@ -44,18 +45,8 @@ class _FormEditCalendarState extends State<FormEditCalendar>{
   }
   @override
   Widget build(BuildContext context){
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Registre um evento',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 24.0,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.green.shade400,
-      ),
+    return AppScaffold(
+      title: 'Edite o evento',
       body: SingleChildScrollView(
           padding: EdgeInsets.all(16.0),
           child: Column(

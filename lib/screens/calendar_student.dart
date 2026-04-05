@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:test_application/screens/event_detail.dart';
 import '../models/calendar_event.dart';
+import '../widgets/app_scaffold.dart';
 import './form_calendar.dart';
 import './form_edit_calendar.dart';
+import 'event_list.dart';
 
 class CalendarStudent extends StatefulWidget {
   const CalendarStudent({super.key});
@@ -18,25 +20,67 @@ class _CalendarStudentState extends State<CalendarStudent> {
   DateTime? _selectedDay;
   final DateTime _firstDay = DateTime.now().subtract(const Duration(days: 365));
   final DateTime _lastDay = DateTime.now().add(const Duration(days: 365));
-
+  @override
+  void initState() {
+    super.initState();
+    final now = DateTime.now();
+    _events.addAll([
+      CalendarEvent(
+        id: '1',
+        title: 'Prova de Cálculo',
+        description: 'Capítulos 1 ao 5',
+        date: now,
+        type: CalendarEventType.prova,
+        authorId: 'local_user',
+        authorName: 'Você',
+        isPersonal: true,
+        createdAt: now,
+        updatedAt: now,
+      ),
+      CalendarEvent(
+        id: '2',
+        title: 'Trabalho de POO',
+        description: 'Entregar no AVA',
+        date: now.add(Duration(days: 3)),
+        type: CalendarEventType.trabalho,
+        authorId: 'local_user',
+        authorName: 'Você',
+        isPersonal: true,
+        createdAt: now,
+        updatedAt: now,
+      ),
+      CalendarEvent(
+        id: '3',
+        title: 'Seminário de TCC',
+        description: null,
+        date: now.add(Duration(days: 7)),
+        type: CalendarEventType.seminario,
+        authorId: 'local_user',
+        authorName: 'Você',
+        isPersonal: true,
+        createdAt: now,
+        updatedAt: now,
+      ),
+    ]);
+  }
   @override
   Widget build(BuildContext context) {
     final selectedEvents = _selectedDay == null
         ? []
         : _events.where((event) => isSameDay(event.date, _selectedDay)).toList();
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "ACADEMUS",
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 24.0,
-            fontWeight: FontWeight.bold,
-          ),
+    return AppScaffold(
+      title: 'Calendário',
+      actions: [
+        IconButton(
+          icon: Icon(Icons.event_note),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => EventList(events: _events)),
+            );
+          },
         ),
-        centerTitle: true,
-        backgroundColor: Colors.green.shade400,
-      ),
+      ],
       body: Column(
         children: [
           Container(

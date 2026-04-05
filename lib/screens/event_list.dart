@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/calendar_event.dart';
+import '../widgets/app_scaffold.dart';
 import 'event_detail.dart';
 class EventList extends StatelessWidget {
   EventList({super.key, required this.events});
@@ -7,17 +8,8 @@ class EventList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context){
-    return Scaffold(appBar: AppBar(
-      title: Text('Todos seus eventos',
-      style: TextStyle(
-      color: Colors.black,
-        fontSize: 24.0,
-        fontWeight: FontWeight.bold
-    ),
-    ),
-      backgroundColor: Colors.green.shade400,
-      centerTitle: true,
-    ),
+    return AppScaffold(
+      title: 'Eventos',
       body: ListView.builder(itemCount: events.length, itemBuilder: (context, index){
         final event = events[index];
         return ListTile(

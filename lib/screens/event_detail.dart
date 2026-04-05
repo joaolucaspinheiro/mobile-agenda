@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/calendar_event.dart';
+import '../widgets/app_scaffold.dart';
 
 class EventDetail extends StatelessWidget{
   final CalendarEvent event;
@@ -7,16 +8,8 @@ class EventDetail extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(appBar: AppBar(title: Text('Detalhes ${event.title}',
-      style: TextStyle(
-      color: Colors.black,
-      fontSize: 24.0,
-      fontWeight: FontWeight.bold,
-    ),
-    ),
-      centerTitle: true,
-      backgroundColor: Colors.green.shade400,
-    ),
+    return AppScaffold(
+        title: 'Detalhes',
         body: Padding(
           padding: EdgeInsets.all(16.0),
           child: Column(

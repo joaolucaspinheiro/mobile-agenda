@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:test_application/models/calendar_event.dart';
+import '../widgets/app_scaffold.dart';
 
 class FormCalendar extends StatefulWidget {
 const FormCalendar({super.key});
@@ -38,18 +38,8 @@ Future<void> _pickDate() async{
 }
 @override
   Widget build(BuildContext context){
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Registre um evento',
-          style: TextStyle(
-          color: Colors.black,
-          fontSize: 24.0,
-          fontWeight: FontWeight.bold,
-        ),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.green.shade400,
-      ),
+  return AppScaffold(
+    title: 'Registre um evento',
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
         child: Column(
