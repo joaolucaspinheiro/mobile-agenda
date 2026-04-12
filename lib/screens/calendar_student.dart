@@ -6,6 +6,7 @@ import '../widgets/app_scaffold.dart';
 import './form_calendar.dart';
 import './form_edit_calendar.dart';
 import 'event_list.dart';
+import 'teacher_home.dart';
 
 class CalendarStudent extends StatefulWidget {
   const CalendarStudent({super.key});
@@ -63,20 +64,34 @@ class _CalendarStudentState extends State<CalendarStudent> {
       ),
     ]);
   }
+
   @override
   Widget build(BuildContext context) {
     final selectedEvents = _selectedDay == null
         ? []
-        : _events.where((event) => isSameDay(event.date, _selectedDay)).toList();
+        : _events
+              .where((event) => isSameDay(event.date, _selectedDay))
+              .toList();
     return AppScaffold(
       title: 'Calendário',
       actions: [
+        IconButton(
+          icon: Icon(Icons.school),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const TeacherHome()),
+            );
+          },
+        ),
         IconButton(
           icon: Icon(Icons.event_note),
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => EventList(events: _events)),
+              MaterialPageRoute(
+                builder: (context) => EventList(events: _events),
+              ),
             );
           },
         ),
@@ -126,78 +141,103 @@ class _CalendarStudentState extends State<CalendarStudent> {
                 _focusedDay = focusedDay;
               },
             ),
-    ),
-    const SizedBox(height: 8.0),
-      Expanded(
-        child: selectedEvents.isEmpty
-            ? Center(child: Text('Nenhum evento neste dia.', style: TextStyle(color: Colors.grey)))
-            : ListView.builder(
-          itemCount: selectedEvents.length,
-          itemBuilder: (context, index) {
-            final event = selectedEvents[index];
-            return ListTile(
-              title: Text(event.title),
-              subtitle: Text(event.type.label),
-              leading: Icon(Icons.event, color: Colors.green.shade400),
-              onTap: () async {
-                Navigator.push<CalendarEvent>(
-                  context,
-                  MaterialPageRoute(builder: (context) => EventDetail(event: event)),
-                );
-              },
-              trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-              IconButton(
-              icon: Icon(Icons.edit, color: Colors.green),
-              onPressed: () async {
-                final updatedEvent = await Navigator.push<CalendarEvent>(
-                  context,
-                  MaterialPageRoute(builder: (context) => FormEditCalendar(event: event)),
-                );
-                if (updatedEvent != null) {
-                  setState(() {
-                    final index = _events.indexWhere((e) => e.id == updatedEvent.id);
-                    if (index != -1) _events[index] = updatedEvent;
-                  });
-                }
-              },
-            ),
-            IconButton(
-            icon: Icon(Icons.delete, color: Colors.red),
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: Text('Excluir evento'),
-                      content: Text('Tem certeza que deseja excluir "${event.title}"?'),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: Text('Cancelar'),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            setState(() => _events.removeWhere((e) => e.id == event.id));
-                            Navigator.pop(context);
-                          },
-                          style: TextButton.styleFrom(foregroundColor: Colors.red),
-                          child: Text('Excluir'),
-                        ),
-                      ],
+          ),
+          const SizedBox(height: 8.0),
+          Expanded(
+            child: selectedEvents.isEmpty
+                ? Center(
+                    child: Text(
+                      'Nenhum evento neste dia.',
+                      style: TextStyle(color: Colors.grey),
                     ),
-                  );
-                },
-              ),
-                  ],
-              ),
-            );
-          },
-        ),
-      ),
+                  )
+                : ListView.builder(
+                    itemCount: selectedEvents.length,
+                    itemBuilder: (context, index) {
+                      final event = selectedEvents[index];
+                      return ListTile(
+                        title: Text(event.title),
+                        subtitle: Text(event.type.label),
+                        leading: Icon(
+                          Icons.event,
+                          color: Colors.green.shade400,
+                        ),
+                        onTap: () async {
+                          Navigator.push<CalendarEvent>(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => EventDetail(event: event),
+                            ),
+                          );
+                        },
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: Icon(Icons.edit, color: Colors.green),
+                              onPressed: () async {
+                                final updatedEvent =
+                                    await Navigator.push<CalendarEvent>(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            FormEditCalendar(event: event),
+                                      ),
+                                    );
+                                if (updatedEvent != null) {
+                                  setState(() {
+                                    final index = _events.indexWhere(
+                                      (e) => e.id == updatedEvent.id,
+                                    );
+                                    if (index != -1)
+                                      _events[index] = updatedEvent;
+                                  });
+                                }
+                              },
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.delete, color: Colors.red),
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: Text('Excluir evento'),
+                                    content: Text(
+                                      'Tem certeza que deseja excluir "${event.title}"?',
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.pop(context),
+                                        child: Text('Cancelar'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          setState(
+                                            () => _events.removeWhere(
+                                              (e) => e.id == event.id,
+                                            ),
+                                          );
+                                          Navigator.pop(context);
+                                        },
+                                        style: TextButton.styleFrom(
+                                          foregroundColor: Colors.red,
+                                        ),
+                                        child: Text('Excluir'),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+          ),
         ],
       ),
-    floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton(
         onPressed: () async {
           final newEvent = await Navigator.push<CalendarEvent>(
             context,
@@ -207,9 +247,9 @@ class _CalendarStudentState extends State<CalendarStudent> {
             setState(() => _events.add(newEvent));
           }
         },
-      backgroundColor: Colors.green.shade400,
-      foregroundColor: Colors.white,
-      child: Icon(Icons.add),
+        backgroundColor: Colors.green.shade400,
+        foregroundColor: Colors.white,
+        child: Icon(Icons.add),
       ),
     );
   }
