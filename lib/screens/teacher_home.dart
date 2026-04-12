@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/app_scaffold.dart';
+import 'class_conflict_checker.dart';
 import 'form_event_teacher.dart';
 import 'teacher_event_list.dart';
 
@@ -41,6 +42,21 @@ class TeacherHome extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => const TeacherEventList(),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 16.0),
+            _MenuCard(
+              icon: Icons.event_busy_outlined,
+              title: 'Verificar Conflitos',
+              subtitle: 'Veja provas e trabalhos de outros professores',
+              color: Colors.orange.shade400,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ClassConflictChecker(),
                   ),
                 );
               },
