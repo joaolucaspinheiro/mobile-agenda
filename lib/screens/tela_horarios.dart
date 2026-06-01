@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:test_application/screens/tela_detalhes_agendamentos.dart';
 
 class TelaHorarios extends StatelessWidget {
   final Map<String, String> professor;
@@ -15,7 +16,7 @@ class TelaHorarios extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Ecolha um horário'),
+        title: const Text('Escolha um horário'),
         backgroundColor: Colors.green,
         foregroundColor: Colors.white,
       ),
@@ -57,7 +58,12 @@ class TelaHorarios extends StatelessWidget {
                     backgroundColor: Colors.green,
                   ),
                 );
-                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const TelaDetalhesAgendamento(),
+                  ),
+                );
               },
             ),
           );

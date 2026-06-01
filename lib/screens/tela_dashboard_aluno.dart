@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:test_application/models/screens/tela_cursos.dart';
+import 'package:test_application/screens/tela_cursos.dart';
+import 'package:test_application/screens/tela_detalhes_agendamentos.dart';
 
 class TelaDashboardAluno extends StatelessWidget {
   const TelaDashboardAluno({super.key});
@@ -39,6 +40,14 @@ class TelaDashboardAluno extends StatelessWidget {
               ),
               isThreeLine: true,
               trailing: const Icon(Icons.cancel, size: 16, color: Colors.red),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const TelaDetalhesAgendamento(),
+                  ),
+                );
+              },
             ),
           ),
 
