@@ -177,6 +177,12 @@ class _FormEventTeacherState extends State<FormEventTeacher> {
                   );
                   return;
                 }
+                if (_selectedCourse == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Selecione uma turma')),
+                  );
+                  return;
+                }
                 final now = DateTime.now();
                 final newEvent = CalendarEvent(
                   id: now.millisecondsSinceEpoch.toString(),

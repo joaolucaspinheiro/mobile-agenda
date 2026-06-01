@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../data/calendar_event_dao.dart';
 import '../models/calendar_event.dart';
 import '../widgets/app_scaffold.dart';
 
@@ -11,54 +13,28 @@ class ClassConflictChecker extends StatefulWidget {
 
 class _ClassConflictCheckerState extends State<ClassConflictChecker> {
   TurmaEnum? _selectedTurma;
+  final List<CalendarEvent> _allEvents = [];
 
-  // Simulando eventos de vários professores para a mesma turma (dados globais)
-  final List<CalendarEvent> _allEvents = [
-    CalendarEvent(
-      id: 'c1',
-      title: 'Prova de Cálculo I',
-      description: 'Derivadas e Integrais',
-      date: DateTime.now().add(const Duration(days: 3)),
-      type: CalendarEventType.prova,
-      course: TurmaEnum.ads1,
-      authorId: 'other_prof',
-      authorName: 'Prof. Marcos',
-      isPersonal: false,
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    ),
-    CalendarEvent(
-      id: 'c2',
-      title: 'Entrega de Banco de Dados',
-      description: 'Modelo Lógico',
-      date: DateTime.now().add(const Duration(days: 3)),
-      type: CalendarEventType.trabalho,
-      course: TurmaEnum.ads1,
-      authorId: 'other_prof2',
-      authorName: 'Profª. Ana',
-      isPersonal: false,
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    ),
-    CalendarEvent(
-      id: 'c3',
-      title: 'Seminário de Redes',
-      description: 'Protocolos TCP/IP',
-      date: DateTime.now().add(const Duration(days: 7)),
-      type: CalendarEventType.seminario,
-      course: TurmaEnum.ads3,
-      authorId: 'other_prof',
-      authorName: 'Prof. Marcos',
-      isPersonal: false,
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    ),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _loadEvents();
+  }
+
+  Future<void> _loadEvents() async {
+    final events = await CalendarEventDao.instance.findTeacherEvents();
+    if (!mounted) return;
+    setState(() {
+      _allEvents
+        ..clear()
+        ..addAll(events);
+    });
+  }
 
   List<CalendarEvent> get _filteredEvents {
     if (_selectedTurma == null) return [];
     final filtered = _allEvents
-        .where((e) => e.course == _selectedTurma)
+        .where((event) => event.course == _selectedTurma)
         .toList();
     filtered.sort((a, b) => a.date.compareTo(b.date));
     return filtered;
@@ -91,10 +67,13 @@ class _ClassConflictCheckerState extends State<ClassConflictChecker> {
                 ),
                 prefixIcon: const Icon(Icons.group),
               ),
-              items: TurmaEnum.values.map((t) {
-                return DropdownMenuItem(value: t, child: Text(t.label));
+              items: TurmaEnum.values.map((turma) {
+                return DropdownMenuItem(
+                  value: turma,
+                  child: Text(turma.label),
+                );
               }).toList(),
-              onChanged: (val) => setState(() => _selectedTurma = val),
+              onChanged: (value) => setState(() => _selectedTurma = value),
             ),
             const SizedBox(height: 24.0),
             if (_selectedTurma != null) ...[
@@ -124,23 +103,7 @@ class _ClassConflictCheckerState extends State<ClassConflictChecker> {
                           final isCritical =
                               event.type == CalendarEventType.prova;
 
-                          return Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(12.0),
-                              border: Border.all(
-                                color: isCritical
-                                    ? Colors.red.shade200
-                                    : Colors.grey.shade200,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.05),
-                                  blurRadius: 4.0,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
+                          return Card(
                             child: ListTile(
                               leading: CircleAvatar(
                                 backgroundColor: isCritical
@@ -155,12 +118,7 @@ class _ClassConflictCheckerState extends State<ClassConflictChecker> {
                                       : Colors.blue.shade700,
                                 ),
                               ),
-                              title: Text(
-                                event.title,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                              title: Text(event.title),
                               subtitle: Text(
                                 'Docente: ${event.authorName}\nTipo: ${event.type.label}',
                               ),
@@ -181,7 +139,7 @@ class _ClassConflictCheckerState extends State<ClassConflictChecker> {
               const Expanded(
                 child: Center(
                   child: Text(
-                    'Escolha uma turma para verificar se já existem provas ou trabalhos marcados por outros professores.',
+                    'Escolha uma turma para verificar se ja existem provas ou trabalhos marcados por professores.',
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.grey),
                   ),

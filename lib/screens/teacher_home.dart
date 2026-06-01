@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import '../data/calendar_event_dao.dart';
+import '../models/calendar_event.dart';
 import '../widgets/app_scaffold.dart';
 import 'class_conflict_checker.dart';
+import 'class_schedule_list.dart';
 import 'form_event_teacher.dart';
 import 'teacher_event_list.dart';
 
@@ -22,13 +25,20 @@ class TeacherHome extends StatelessWidget {
               title: 'Cadastrar Evento',
               subtitle: 'Adicione provas, trabalhos e eventos para turmas',
               color: Colors.green.shade400,
-              onTap: () {
-                Navigator.push(
+              onTap: () async {
+                final event = await Navigator.push<CalendarEvent>(
                   context,
                   MaterialPageRoute(
                     builder: (context) => const FormEventTeacher(),
                   ),
                 );
+                if (event != null) {
+                  await CalendarEventDao.instance.save(event);
+                  if (!context.mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Evento salvo com sucesso.')),
+                  );
+                }
               },
             ),
             const SizedBox(height: 16.0),
@@ -42,6 +52,21 @@ class TeacherHome extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => const TeacherEventList(),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 16.0),
+            _MenuCard(
+              icon: Icons.schedule,
+              title: 'Gerenciar Horarios',
+              subtitle: 'Cadastre, edite e exclua horarios de aula',
+              color: Colors.purple.shade400,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ClassScheduleList(),
                   ),
                 );
               },

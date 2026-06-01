@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:test_application/screens/event_detail.dart';
+
+import '../data/calendar_event_dao.dart';
 import '../models/calendar_event.dart';
 import '../widgets/app_scaffold.dart';
 import './form_calendar.dart';
@@ -10,6 +12,7 @@ import 'teacher_home.dart';
 
 class CalendarStudent extends StatefulWidget {
   const CalendarStudent({super.key});
+
   @override
   State<CalendarStudent> createState() => _CalendarStudentState();
 }
@@ -21,62 +24,34 @@ class _CalendarStudentState extends State<CalendarStudent> {
   DateTime? _selectedDay;
   final DateTime _firstDay = DateTime.now().subtract(const Duration(days: 365));
   final DateTime _lastDay = DateTime.now().add(const Duration(days: 365));
+
   @override
   void initState() {
     super.initState();
-    final now = DateTime.now();
-    _events.addAll([
-      CalendarEvent(
-        id: '1',
-        title: 'Prova de Cálculo',
-        description: 'Capítulos 1 ao 5',
-        date: now,
-        type: CalendarEventType.prova,
-        authorId: 'local_user',
-        authorName: 'Você',
-        isPersonal: true,
-        createdAt: now,
-        updatedAt: now,
-      ),
-      CalendarEvent(
-        id: '2',
-        title: 'Trabalho de POO',
-        description: 'Entregar no AVA',
-        date: now.add(Duration(days: 3)),
-        type: CalendarEventType.trabalho,
-        authorId: 'local_user',
-        authorName: 'Você',
-        isPersonal: true,
-        createdAt: now,
-        updatedAt: now,
-      ),
-      CalendarEvent(
-        id: '3',
-        title: 'Seminário de TCC',
-        description: null,
-        date: now.add(Duration(days: 7)),
-        type: CalendarEventType.seminario,
-        authorId: 'local_user',
-        authorName: 'Você',
-        isPersonal: true,
-        createdAt: now,
-        updatedAt: now,
-      ),
-    ]);
+    _loadEvents();
+  }
+
+  Future<void> _loadEvents() async {
+    final events = await CalendarEventDao.instance.findPersonal();
+    if (!mounted) return;
+    setState(() {
+      _events
+        ..clear()
+        ..addAll(events);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final selectedEvents = _selectedDay == null
-        ? []
-        : _events
-              .where((event) => isSameDay(event.date, _selectedDay))
-              .toList();
+        ? <CalendarEvent>[]
+        : _events.where((event) => isSameDay(event.date, _selectedDay)).toList();
+
     return AppScaffold(
-      title: 'Calendário',
+      title: 'Calendario',
       actions: [
         IconButton(
-          icon: Icon(Icons.school),
+          icon: const Icon(Icons.school),
           onPressed: () {
             Navigator.push(
               context,
@@ -85,13 +60,11 @@ class _CalendarStudentState extends State<CalendarStudent> {
           },
         ),
         IconButton(
-          icon: Icon(Icons.event_note),
+          icon: const Icon(Icons.event_note),
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (context) => EventList(events: _events),
-              ),
+              MaterialPageRoute(builder: (context) => EventList(events: _events)),
             );
           },
         ),
@@ -99,8 +72,8 @@ class _CalendarStudentState extends State<CalendarStudent> {
       body: Column(
         children: [
           Container(
-            margin: EdgeInsets.all(5.0),
-            padding: EdgeInsets.all(10.0),
+            margin: const EdgeInsets.all(5.0),
+            padding: const EdgeInsets.all(10.0),
             decoration: BoxDecoration(
               color: Colors.white,
               border: Border.all(color: Colors.black, width: 2.0),
@@ -126,16 +99,12 @@ class _CalendarStudentState extends State<CalendarStudent> {
                 formatButtonVisible: false,
                 titleCentered: true,
               ),
-              selectedDayPredicate: (day) {
-                return isSameDay(_selectedDay, day);
-              },
+              selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
               onDaySelected: (selectedDay, focusedDay) {
-                if (!isSameDay(_selectedDay, focusedDay)) {
-                  setState(() {
-                    _focusedDay = focusedDay;
-                    _selectedDay = selectedDay;
-                  });
-                }
+                setState(() {
+                  _focusedDay = focusedDay;
+                  _selectedDay = selectedDay;
+                });
               },
               onPageChanged: (focusedDay) {
                 _focusedDay = focusedDay;
@@ -145,7 +114,7 @@ class _CalendarStudentState extends State<CalendarStudent> {
           const SizedBox(height: 8.0),
           Expanded(
             child: selectedEvents.isEmpty
-                ? Center(
+                ? const Center(
                     child: Text(
                       'Nenhum evento neste dia.',
                       style: TextStyle(color: Colors.grey),
@@ -158,12 +127,9 @@ class _CalendarStudentState extends State<CalendarStudent> {
                       return ListTile(
                         title: Text(event.title),
                         subtitle: Text(event.type.label),
-                        leading: Icon(
-                          Icons.event,
-                          color: Colors.green.shade400,
-                        ),
-                        onTap: () async {
-                          Navigator.push<CalendarEvent>(
+                        leading: Icon(Icons.event, color: Colors.green.shade400),
+                        onTap: () {
+                          Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => EventDetail(event: event),
@@ -174,59 +140,29 @@ class _CalendarStudentState extends State<CalendarStudent> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
-                              icon: Icon(Icons.edit, color: Colors.green),
+                              icon: const Icon(Icons.edit, color: Colors.green),
                               onPressed: () async {
-                                final updatedEvent =
-                                    await Navigator.push<CalendarEvent>(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            FormEditCalendar(event: event),
-                                      ),
-                                    );
+                                final updatedEvent = await Navigator.push<CalendarEvent>(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => FormEditCalendar(event: event),
+                                  ),
+                                );
                                 if (updatedEvent != null) {
+                                  await CalendarEventDao.instance.save(updatedEvent);
                                   setState(() {
-                                    final index = _events.indexWhere(
-                                      (e) => e.id == updatedEvent.id,
-                                    );
-                                    if (index != -1)
-                                      _events[index] = updatedEvent;
+                                    _selectedDay = updatedEvent.date;
+                                    _focusedDay = updatedEvent.date;
                                   });
+                                  await _loadEvents();
                                 }
                               },
                             ),
                             IconButton(
-                              icon: Icon(Icons.delete, color: Colors.red),
-                              onPressed: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) => AlertDialog(
-                                    title: Text('Excluir evento'),
-                                    content: Text(
-                                      'Tem certeza que deseja excluir "${event.title}"?',
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () => Navigator.pop(context),
-                                        child: Text('Cancelar'),
-                                      ),
-                                      TextButton(
-                                        onPressed: () {
-                                          setState(
-                                            () => _events.removeWhere(
-                                              (e) => e.id == event.id,
-                                            ),
-                                          );
-                                          Navigator.pop(context);
-                                        },
-                                        style: TextButton.styleFrom(
-                                          foregroundColor: Colors.red,
-                                        ),
-                                        child: Text('Excluir'),
-                                      ),
-                                    ],
-                                  ),
-                                );
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              onPressed: () async {
+                                await CalendarEventDao.instance.delete(event.id);
+                                await _loadEvents();
                               },
                             ),
                           ],
@@ -244,12 +180,17 @@ class _CalendarStudentState extends State<CalendarStudent> {
             MaterialPageRoute(builder: (context) => const FormCalendar()),
           );
           if (newEvent != null) {
-            setState(() => _events.add(newEvent));
+            await CalendarEventDao.instance.save(newEvent);
+            setState(() {
+              _selectedDay = newEvent.date;
+              _focusedDay = newEvent.date;
+            });
+            await _loadEvents();
           }
         },
         backgroundColor: Colors.green.shade400,
         foregroundColor: Colors.white,
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }
