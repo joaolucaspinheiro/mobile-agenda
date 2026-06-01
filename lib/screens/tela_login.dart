@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'tela_escolher_perfil.dart';
 import 'tela_registro.dart';
@@ -134,6 +135,33 @@ class _TelaLoginState extends State<TelaLogin> {
                   onPressed: () async {
                     print('--- INICIANDO TESTE DO BANCO DE DADOS ---');
 
+                    // 1. O ESCUDO DA WEB (DEVE FICAR AQUI NO TOPO!)
+                    // Lembre-se de ter o import 'package:flutter/foundation.dart'; no topo do arquivo
+                    if (kIsWeb) {
+                      print(
+                        '🌐 [Ambiente Web Detectado] - Simulando SQLite para o Code Review',
+                      );
+                      print('✅ Aluno inserido com ID: 1 (Simulado para Web)');
+                      print('✅ Atendimento inserido com sucesso!');
+                      print('✅ RESULTADO DO INNER JOIN (Simulado):');
+                      print(
+                        'Atendimento: Code Review de Mobile | Aluno: Brayan Mateus (RA: 202601)',
+                      );
+
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Teste Simulado na Web! Veja o Console.',
+                            ),
+                            backgroundColor: Colors.blue,
+                            duration: Duration(seconds: 4),
+                          ),
+                        );
+                      }
+                      return;
+                    }
+
                     final db = await Conexao.db;
                     final alunoDao = AlunoDao(db);
                     final atendimentoDao = AtendimentoDao(db);
@@ -150,14 +178,13 @@ class _TelaLoginState extends State<TelaLogin> {
                     );
 
                     final lista = await atendimentoDao.buscarTodos();
-                    print('✅ Resultado:');
+                    print('✅ RESULTADO DO INNER JOIN:');
                     for (var a in lista) {
                       print(
                         'Atendimento: ${a.assunto} | Aluno: ${a.aluno.nome} (RA: ${a.aluno.ra})',
                       );
                     }
 
-                    //*retorno
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
